@@ -4,6 +4,8 @@ Fabric server event system &amp; more?
 
 idea is that sponge/forge/bukkit all have event systems, and fabric kinda does too but this adds one that's similar to the other three. Will anyone use it? will i continue working on it? do i have the knowledge to make something like this?
 
+other ideal: mods would add events, perhaps rather than listen to them so that people who wanted to use server side mods could get use of them, who knows
+
 we'll call it weavingMC because we're so hilarious basing the name of a mod on the idea of "weaving" and "fabric" hilarious! if anyone uses this maybe we'll update the readme too
 
 # Credit

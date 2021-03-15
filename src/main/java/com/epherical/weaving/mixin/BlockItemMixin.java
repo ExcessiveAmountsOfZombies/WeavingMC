@@ -5,6 +5,9 @@ import com.epherical.weaving.internal.EventManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.network.packet.s2c.play.InventoryS2CPacket;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,28 +23,29 @@ public class BlockItemMixin {
             at = {@At("HEAD")},
             slice = @Slice(
                     from = @At(
-                            value = "INVOKE",
-                            target = ""
-                    )/*,
+                            value = "INVOKE_ASSIGN",
+                            target = "Lnet/minecraft/item/BlockItem;getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;"
+                    ),
                     to = @At(
                             value = "INVOKE_ASSIGN",
                             target = "Lnet/minecraft/item/BlockItem;getPlacementState(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;",
                             ordinal = 1
-                    )*/
+                    )
             ),
             locals = LocalCapture.CAPTURE_FAILEXCEPTION,
             cancellable = true)
-    public void place(ItemPlacementContext context, CallbackInfoReturnable<ActionResult> cir, BlockState blockState) {
+    public void place(ItemPlacementContext unused, CallbackInfoReturnable<ActionResult> cir, ItemPlacementContext context, BlockState blockState) {
         if (blockState == null) {
             cir.setReturnValue(ActionResult.FAIL);
         }
-        if (!context.getWorld().isClient) {
-            ServerEventBlockPlace place = new ServerEventBlockPlace(context, blockState);
-            EventManager.callEvent(place);
-            if (place.isCancelled()) {
-                cir.setReturnValue(ActionResult.FAIL);
-                cir.cancel();
-            }
+        ServerEventBlockPlace place = new ServerEventBlockPlace(context, blockState);
+        EventManager.callEvent(place);
+        if (place.isCancelled()) {
+            cir.setReturnValue(ActionResult.FAIL);
+            ServerPlayerEntity player = (ServerPlayerEntity) context.getPlayer();
+            ScreenHandler screenHandler = player.currentScreenHandler;
+            player.networkHandler.sendPacket(new InventoryS2CPacket(screenHandler.syncId, screenHandler.getStacks()));
+            cir.cancel();
         }
     }
 }

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "weaving",
+  "version": "${version}",
+  "name": "Weaving",
+  "description": "Dingo",
+  "authors": [
+    "Thonk"
+  ],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/weaving/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "server": [
+      "com.epherical.weaving.Weaving"
+    ]
+  },
+  "mixins": [
+    "weaving.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.2",
+    "fabric": "*",
+    "minecraft": "1.16.5"
+  }
+}
